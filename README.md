@@ -64,7 +64,7 @@ Then open: <http://localhost:8080>
    git add .
    git commit -m "Modern HN"
    git branch -M main
-   git remote add origin https://github.com/<username>/<repo>.git
+   git remote add origin https://github.com/mehmetkahya0/modern-hacker-news.git
    git push -u origin main
    ```
 
@@ -73,7 +73,7 @@ Then open: <http://localhost:8080>
 
    Alternative: you can instead choose **Deploy from a branch → main / (root)** as the source; in that case the workflow isn't needed.
 
-3. Address: `https://<username>.github.io/<repo>/`
+3. Address: `https://mehmetkahya0.github.io/modern-hacker-news/`
 
 All paths are relative (`assets/...`) and routing is hash-based (`#/item/123`), so no extra configuration is needed for subdirectories or custom domains. The `.nojekyll` file disables Jekyll processing.
 
