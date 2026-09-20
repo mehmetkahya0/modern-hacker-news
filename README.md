@@ -1,98 +1,98 @@
 # Modern HN
 
-[Hacker News resmi API'si](https://github.com/HackerNews/API) ile beslenen, okunabilirlik odaklı bir Hacker News arayüzü. Derleme adımı yok, bağımlılık yok — saf HTML/CSS/JS. GitHub Pages'e olduğu gibi yüklenir.
+A readability-focused Hacker News interface powered by the [official Hacker News API](https://github.com/HackerNews/API). No build step, no dependencies — plain HTML/CSS/JS. Deploys to GitHub Pages as-is.
 
-## Özellikler
+## Features
 
-- **Canlı veri** — tüm içerik `hacker-news.firebaseio.com/v0` üzerinden anlık çekilir; önbellek kısa ömürlüdür (liste 60 sn, içerik 5 dk).
-- **Akışlar** — Popüler, Yeni, En İyi, Ask HN, Show HN, İşler + yerel "Kayıtlar" listesi.
-- **Zengin liste düzeni** — düz metin yığını yerine her satırın kimliği var:
-  - *kaynak çapası*: domain favicon'u; yüklenemezse domain adından türeyen kararlı renkli monogram,
-  - *kaynak satırı*: domain · zaman · yazar,
-  - *ilgi ısısı*: saat başına puan (`sakin` → `çok canlı`) küçük bir çubukla,
-  - *bağlam alıntısı*: metin gönderilerinde gönderinin kendi metni, bağlantı gönderilerinde en üst yorumdan iki satırlık alıntı — böylece tıklamadan önce tartışmanın nereye gittiği görülür.
-- **Yeni gönderi bildirimi** — açık sekmede akış 90 saniyede bir kontrol edilir, yenilik varsa üstte uyarı çıkar.
-- **Yeni yorum takibi** — her gönderi için son okuma zamanı ve o andaki yorum sayısı saklanır:
-  - akışta ziyaret ettiğin gönderilerde `+N yeni` rozeti,
-  - iş parçacığında son okumandan sonra yazılan yorumlarda `yeni` etiketi, vurgulu yazar adı ve sol kenar çizgisi,
-  - `n` / `p` ile yalnızca yeni yorumlar arasında gezinme (yeni yoksa üst düzey yorumlar arasında),
-  - gönderiyi paylaşan kişinin yorumlarında `OP` rozeti.
-- **Canlı iş parçacığı** — açık gönderi sayfası 60 saniyede bir yoklanır; yorum sayısı arttıysa "N yeni yorum geldi — Getir" şeridi çıkar, tıklayınca ağaç tazelenir ve gelenler `yeni` olarak işaretli gelir.
-- **Okunabilir yorum ağacı** — katlanabilir başlıklar, derinlik çizgileri, ayarlanabilir satır genişliği, parti parti yükleme.
-- **İş parçacığı denetimleri** — hepsi yüklü ağaç üzerinde çalışır, ek istek yapmaz:
-  - üst düzey yorumları *HN sırası* / *en yeni* / *en çok yanıt* diye sıralama,
-  - `f` ile yorum içi arama: eşleşmeler ve üst zincirleri kalır, gerisi süzülür, katlanmış dallar kendiliğinden açılır, `Enter` / `Shift+Enter` eşleşmeler arasında gezer,
-  - hepsini katla / aç.
-- **Yanıt dalı görünümü** — yorumların yanındaki `#` bağlantısı artık HN'ye değil uygulama içindeki `#/item/<yorum>` adresine gider: dal başlık olur, üstünde kök gönderiye çıkan bir iz durur, OP rozeti kökün yazarına göre hesaplanır.
-- **Anketler** — `poll` gönderilerinde seçenekler (`parts` → `pollopt`) çekilir; her seçenek oy sayısı, toplam içindeki yüzdesi ve en yüksek seçeneğe göre ölçeklenmiş bir çubukla gösterilir.
-- **Okuma ayarları** (`,`) — yazı boyutu (%85–150), satır genişliği (dar / orta / geniş), yoğunluk (rahat / sıkışık) ve yazı tipi (sans / serif). Ayarlar kök öğeye tasarım belirteci olarak yazılır, `localStorage`'da saklanır.
-- **Paylaşım** — Web Share API varsa sistem paylaşım sayfası, yoksa panoya kopyalama. Paylaşılan adres her zaman dışarıdan açılabilen bir adrestir: bağlantı gönderilerinde makale, metin gönderisi/anket/yorumda HN sayfası.
-- **Arama** — [HN Search (Algolia) API](https://hn.algolia.com/api) ile gönderi/yorum araması, ilgi veya tarih sıralaması.
-- **Tema** — sistem / açık / koyu; tercih `localStorage`'da saklanır.
-- **Okundu takibi ve kaydetme** — tarayıcıda yerel tutulur, hesap gerekmez.
-- **Klavye kısayolları** — `j` `k` gezinme, `Enter`/`o` aç, `c` yorumlar, `n` `p` yeni yorumlar, `t` çevir, `s` kaydet, `Shift+s` paylaş, `f` yorumlarda ara, `,` okuma ayarları, `/` arama, `d` tema, `g` başa dön, `?` yardım.
-- Erişilebilirlik: atlama bağlantısı, odak halkaları, `aria` etiketleri, `prefers-reduced-motion` desteği.
+- **Live data** — all content is fetched in real time from `hacker-news.firebaseio.com/v0`; caching is short-lived (60 s for lists, 5 min for items).
+- **Feeds** — Top, New, Best, Ask HN, Show HN, Jobs, plus a local "Saved" list.
+- **Rich list layout** — every row has an identity instead of being a flat text stack:
+  - *source anchor*: the domain's favicon, falling back to a stable colored monogram derived from the domain name if it fails to load,
+  - *source line*: domain · time · author,
+  - *interest heat*: points-per-hour (`calm` → `very active`) shown as a small bar,
+  - *context quote*: for text posts, the post's own body; for link posts, a two-line excerpt from the top comment — so you can see where the discussion is heading before clicking.
+- **New post notifications** — while a feed tab is open, it's checked every 90 seconds; a banner appears at the top when new items show up.
+- **New comment tracking** — for every post, the last-read time and comment count at that moment are stored:
+  - a `+N new` badge on posts you've visited, shown in the feed,
+  - a `new` tag, highlighted author name, and left border on comments written after your last read, shown in the thread,
+  - `n` / `p` to jump only between new comments (or top-level comments if there are none),
+  - an `OP` badge on comments from the person who submitted the post.
+- **Live thread** — an open post page is polled every 60 seconds; if the comment count has increased, a "N new comments — Fetch" strip appears, and clicking it refreshes the tree with incoming comments marked as `new`.
+- **Readable comment tree** — collapsible headers, depth lines, adjustable line width, incremental loading.
+- **Thread controls** — all operate on the already-loaded tree, no extra requests:
+  - sort top-level comments by *HN order* / *newest* / *most replies*,
+  - `f` to search within comments: matches and their parent chain remain, everything else is filtered out, collapsed branches auto-expand, `Enter` / `Shift+Enter` jump between matches,
+  - collapse all / expand all.
+- **Reply-branch view** — the `#` link next to a comment now goes to the app's own `#/item/<comment>` address instead of HN: the branch becomes the page title, a breadcrumb trail up to the root post is shown, and the `OP` badge is computed relative to the root's author.
+- **Polls** — for `poll` posts, options (`parts` → `pollopt`) are fetched; each option shows its vote count, its percentage of the total, and a bar scaled to the highest-voted option.
+- **Reading settings** (`,`) — font size (85–150%), line width (narrow / medium / wide), density (comfortable / compact), and font (sans / serif). Settings are written to the root element as design tokens and persisted in `localStorage`.
+- **Sharing** — uses the system share sheet via the Web Share API if available, otherwise copies to clipboard. The shared address is always one that can be opened externally: the article for link posts, the HN page for text posts/polls/comments.
+- **Search** — post/comment search via the [HN Search (Algolia) API](https://hn.algolia.com/api), sortable by relevance or date.
+- **Theme** — system / light / dark; preference stored in `localStorage`.
+- **Read tracking and saving** — kept locally in the browser, no account required.
+- **Keyboard shortcuts** — `j` `k` navigate, `Enter`/`o` open, `c` comments, `n` `p` new comments, `t` translate, `s` save, `Shift+s` share, `f` search within comments, `,` reading settings, `/` search, `d` theme, `g` go to top, `?` help.
+- Accessibility: skip link, focus rings, `aria` labels, `prefers-reduced-motion` support.
 
-## Ayarlanabilir noktalar
+## Tunable points
 
-- **Alıntı önizlemesi** gönderi başına 1 ek istek demektir; yalnızca kart ekrana girdiğinde (IntersectionObserver) çekilir. Kapatmak için `assets/js/views/components.js` içinde `data-needs-preview` niteliğini üreten koşulu kaldırmak yeterli.
-- **Favicon'lar** `icons.duckduckgo.com` üzerinden gelir — tek üçüncü taraf istek burasıdır. İstemezsen `components.js` içindeki `faviconUrl` fonksiyonunu `null` döndürecek şekilde değiştir; monogram çapası zaten yedek olarak duruyor, arayüz aynı çalışır.
-- **Isı eşikleri** `components.js` içindeki `heat()` fonksiyonunda (`rate / 50`) tek satırda ayarlanır.
-- **Canlı yoklama aralıkları** `views/item.js` içinde `POLL_MS` (60 sn) ve `views/list.js` içinde `REFRESH_MS` (90 sn). İkisi de sekme arka plandayken (`document.hidden`) durur.
-- **Ziyaret geçmişi** en yeni 400 gönderiyle sınırlıdır (`store.js` → `recordVisit`); tamamen yereldir, hiçbir yere gönderilmez.
-- **Okuma ayarlarının varsayılanları ve sınırları** `store.js` içindeki `READING_DEFAULTS` ile `READING_LIMITS`'tedir. Değerler `applyReading()` ile kök öğeye `--read-scale`, `--read-width`, `data-density`, `data-reading` olarak yazılır; yeni bir görünümün bunları ayrıca işlemesi gerekmez, ilgili CSS kuralları zaten bu belirteçlerden okur.
-- **Anket seçenekleri** gönderi başına ek istek demektir (her `pollopt` ayrı bir kayıt), ama yalnızca `type: "poll"` gönderilerde ve başlık çizildikten sonra çekilir; gönderinin görünmesini geciktirmez.
+- **Quote preview** costs 1 extra request per post; it's only fetched once the card enters the viewport (via IntersectionObserver). To disable it, remove the condition that produces the `data-needs-preview` attribute in `assets/js/views/components.js`.
+- **Favicons** come from `icons.duckduckgo.com` — the only third-party request in the app. If you'd rather not use it, change the `faviconUrl` function in `components.js` to return `null`; the monogram fallback is already in place, so the UI keeps working the same way.
+- **Heat thresholds** are set in a single line in the `heat()` function in `components.js` (`rate / 50`).
+- **Live polling intervals**: `POLL_MS` (60 s) in `views/item.js` and `REFRESH_MS` (90 s) in `views/list.js`. Both pause while the tab is in the background (`document.hidden`).
+- **Visit history** is capped at the most recent 400 posts (`store.js` → `recordVisit`); it's entirely local and never sent anywhere.
+- **Reading setting defaults and limits** live in `READING_DEFAULTS` and `READING_LIMITS` in `store.js`. Values are written to the root element via `applyReading()` as `--read-scale`, `--read-width`, `data-density`, `data-reading`; a new view doesn't need to handle these separately, since the relevant CSS rules already read from these tokens.
+- **Poll options** cost an extra request per post (each `pollopt` is a separate record), but they're only fetched for `type: "poll"` posts and only after the title has rendered, so they don't delay the post from appearing.
 
-## Yerelde çalıştırma
+## Running locally
 
-ES modülleri kullanıldığı için dosyayı çift tıklayarak (`file://`) açmak yerine küçük bir sunucu gerekir:
+Since ES modules are used, you need a small server instead of opening the file directly (`file://`):
 
 ```bash
 python -m http.server 8080
-# veya
+# or
 npx serve .
 ```
 
-Sonra: <http://localhost:8080>
+Then open: <http://localhost:8080>
 
-## GitHub Pages'te yayınlama
+## Publishing to GitHub Pages
 
-1. Bu klasörü bir GitHub deposuna gönder:
+1. Push this folder to a GitHub repository:
 
    ```bash
    git init
    git add .
    git commit -m "Modern HN"
    git branch -M main
-   git remote add origin https://github.com/<kullanici>/<depo>.git
+   git remote add origin https://github.com/<username>/<repo>.git
    git push -u origin main
    ```
 
-2. Depo → **Settings → Pages → Build and deployment → Source: GitHub Actions** seç.
-   Depodaki `.github/workflows/deploy.yml` her `main` push'unda siteyi yayınlar.
+2. In the repo, go to **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+   The `.github/workflows/deploy.yml` in this repo publishes the site on every push to `main`.
 
-   Alternatif: Source olarak **Deploy from a branch → main / (root)** de seçebilirsin; bu durumda workflow'a gerek yoktur.
+   Alternative: you can instead choose **Deploy from a branch → main / (root)** as the source; in that case the workflow isn't needed.
 
-3. Adres: `https://<kullanici>.github.io/<depo>/`
+3. Address: `https://<username>.github.io/<repo>/`
 
-Tüm yollar görecelidir (`assets/...`) ve yönlendirme hash tabanlıdır (`#/item/123`), bu yüzden alt dizinde de, özel alan adında da ek ayar gerekmez. `.nojekyll` dosyası Jekyll işlemesini kapatır.
+All paths are relative (`assets/...`) and routing is hash-based (`#/item/123`), so no extra configuration is needed for subdirectories or custom domains. The `.nojekyll` file disables Jekyll processing.
 
-## Dosya düzeni
+## File layout
 
 ```
-index.html                 arayüz iskeleti
-assets/css/style.css       tasarım belirteçleri + tüm stiller
-assets/js/api.js           HN API istemcisi (önbellek, yeniden deneme)
-assets/js/store.js         tema, okuma ayarları, okunanlar, kayıtlar (localStorage)
-assets/js/router.js        hash yönlendirme
-assets/js/util.js          yardımcılar + HTML sanitizasyonu + istek havuzu
-assets/js/app.js           kabuk: sekmeler, arama, kısayollar, yönlendirme
-assets/js/views/           liste, gönderi, kullanıcı, arama görünümleri
+index.html                 app shell markup
+assets/css/style.css       design tokens + all styles
+assets/js/api.js           HN API client (caching, retry)
+assets/js/store.js         theme, reading settings, read state, saves (localStorage)
+assets/js/router.js        hash-based routing
+assets/js/util.js          helpers + HTML sanitization + request pool
+assets/js/app.js           shell: tabs, search, shortcuts, routing
+assets/js/views/           list, item, user, search views
 ```
 
-## Notlar
+## Notes
 
-- HN API'si kimlik doğrulama veya API anahtarı istemez, CORS açıktır; bu yüzden istekler doğrudan tarayıcıdan yapılır.
-- API tek seferde toplu içerik döndürmez, her gönderi ayrı istektir. Bu yüzden istekler eşzamanlılık havuzuyla (aynı anda 8) sınırlandırılmıştır.
-- Yorum metinleri HN tarafında HTML içerir; beyaz liste dışındaki etiketler `assets/js/util.js` içindeki `sanitize()` ile düz metne indirgenir.
-- Bu proje Y Combinator ile ilişkili değildir.
+- The HN API requires no authentication or API key and has CORS open, so requests are made directly from the browser.
+- The API doesn't return bulk content in one call — each post is a separate request. Requests are therefore limited with a concurrency pool (8 at a time).
+- Comment bodies contain HTML from HN's side; tags outside the whitelist are stripped down to plain text by `sanitize()` in `assets/js/util.js`.
+- This project is not affiliated with Y Combinator.
