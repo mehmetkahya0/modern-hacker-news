@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Modern HN — Okunabilir Hacker News</title>
+<meta name="description" content="Hacker News'in resmi API'siyle beslenen, okunabilirlik odaklı modern arayüz.">
+<meta name="theme-color" content="#fbfaf8">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://hacker-news.firebaseio.com" crossorigin>
+<link rel="preconnect" href="https://hn.algolia.com" crossorigin>
+<!-- Latin altkümesi ilk boyada kesin gerekiyor: CSS ayrıştırılana kadar
+     beklemesin. Genişletilmiş altküme (Türkçe aksanlar) talep üzerine gelir. -->
+<link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23ff6600'/><path d='M9 8h4l3 6 3-6h4l-5 9v7h-4v-7z' fill='white'/></svg>">
+</head>
+<body>
+<a class="skip-link" href="#app" data-skip>İçeriğe atla</a>
+
+<!-- Görünüm değişikliklerini ekran okuyucuya duyurur. -->
+<p class="sr-only" id="route-status" role="status" aria-live="polite"></p>
+
+<header class="topbar">
+  <div class="topbar__row">
+    <a class="brand" href="#/top">
+      <span class="brand__mark" aria-hidden="true">Y</span>
+      <span class="brand__name">Modern<span class="brand__accent">HN</span></span>
+    </a>
+
+    <form class="search" id="search-form" role="search">
+      <svg class="search__icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M11 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zm-.7 4.7a6 6 0 1 1 1.4-1.4l3.3 3.3-1.4 1.4z"/></svg>
+      <input id="search-input" class="search__input" type="search" placeholder="Hacker News'te ara…" aria-label="Hacker News'te ara" autocomplete="off">
+      <kbd class="search__kbd" aria-hidden="true">/</kbd>
+    </form>
+
+    <div class="topbar__actions">
+      <div class="reading-picker" id="reading-picker">
+        <button class="icon-btn icon-btn--lg" id="reading-toggle" type="button" title="Okuma ayarları (,)" aria-label="Okuma ayarları" aria-expanded="false">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><text x="10" y="14.5" text-anchor="middle" font-size="12.5" font-weight="700" font-family="inherit" fill="currentColor">Aa</text></svg>
+        </button>
+        <div class="reading-panel" id="reading-panel" hidden role="group" aria-label="Okuma ayarları">
+          <div class="reading-row">
+            <span class="reading-row__label">Yazı boyutu</span>
+            <div class="seg">
+              <button class="seg__btn" type="button" data-read-scale="-1" aria-label="Yazıyı küçült">−</button>
+              <span class="seg__value" id="reading-scale-value">%100</span>
+              <button class="seg__btn" type="button" data-read-scale="1" aria-label="Yazıyı büyüt">+</button>
+            </div>
+          </div>
+          <div class="reading-row">
+            <span class="reading-row__label">Satır genişliği</span>
+            <div class="seg">
+              <button class="seg__btn" type="button" data-read-width="58" aria-pressed="false">Dar</button>
+              <button class="seg__btn" type="button" data-read-width="68" aria-pressed="false">Orta</button>
+              <button class="seg__btn" type="button" data-read-width="82" aria-pressed="false">Geniş</button>
+            </div>
+          </div>
+          <div class="reading-row">
+            <span class="reading-row__label">Yoğunluk</span>
+            <div class="seg">
+              <button class="seg__btn" type="button" data-read-density="cozy" aria-pressed="false">Rahat</button>
+              <button class="seg__btn" type="button" data-read-density="compact" aria-pressed="false">Sıkışık</button>
+            </div>
+          </div>
+          <div class="reading-row">
+            <span class="reading-row__label">Yazı tipi</span>
+            <div class="seg">
+              <button class="seg__btn" type="button" data-read-family="sans" aria-pressed="false">Sans</button>
+              <button class="seg__btn seg__btn--serif" type="button" data-read-family="serif" aria-pressed="false">Serif</button>
+            </div>
+          </div>
+          <button class="btn btn--ghost btn--small reading-reset" type="button" data-read-reset>Varsayılana dön</button>
+        </div>
+      </div>
+      <div class="lang-picker" id="lang-picker">
+        <button class="icon-btn icon-btn--lg lang-btn" id="lang-toggle" type="button" title="Çeviri Dili Seç" aria-label="Çeviri dili seç" aria-expanded="false">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="10" cy="10" r="8"/>
+            <path d="M2 10h16M10 2a13 13 0 0 1 3.5 8 13 13 0 0 1-3.5 8 13 13 0 0 1-3.5-8A13 13 0 0 1 10 2z"/>
+          </svg>
+          <span class="lang-badge" id="lang-badge">TR</span>
+        </button>
+        <div class="lang-dropdown" id="lang-dropdown" hidden role="menu" aria-label="Diller"></div>
+      </div>
+      <button class="icon-btn icon-btn--lg" id="theme-toggle" type="button" title="Tema" aria-label="Tema değiştir">
+        <svg class="icon-sun" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4"/><path d="M10 1v2.5M10 16.5V19M1 10h2.5M16.5 10H19M3.6 3.6l1.8 1.8M14.6 14.6l1.8 1.8M16.4 3.6l-1.8 1.8M5.4 14.6l-1.8 1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>
+        <svg class="icon-moon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16 12.5A7 7 0 0 1 7.5 4a7 7 0 1 0 8.5 8.5z"/></svg>
+        <svg class="icon-auto" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.8a7.2 7.2 0 0 1 0 14.4z"/></svg>
+      </button>
+      <button class="icon-btn icon-btn--lg" id="help-btn" type="button" title="Kısayollar (?)" aria-label="Klavye kısayolları">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm.1 13.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM10 4.4c2 0 3.5 1.3 3.5 3.1 0 1.4-.7 2.1-1.9 2.9-.8.5-1 .8-1 1.5v.4H8.7v-.6c0-1.3.5-2 1.6-2.7.9-.6 1.2-1 1.2-1.6 0-.8-.6-1.4-1.6-1.4s-1.7.6-1.8 1.6H6.5c.1-1.9 1.5-3.2 3.5-3.2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <nav class="tabs" id="tabs" aria-label="Akışlar"></nav>
+</header>
+
+<div class="offline-bar" id="offline-bar" role="status" hidden>
+  <span class="offline-bar__dot" aria-hidden="true"></span>
+  Çevrimdışısın — gösterilenler daha önce yüklenmiş içerikler.
+</div>
+
+<main id="app" class="main" tabindex="-1"></main>
+
+<footer class="footer">
+  <p>
+    Veriler <a href="https://github.com/HackerNews/API" target="_blank" rel="noopener noreferrer">Hacker News resmi API'sinden</a>
+    canlı olarak çekilir. Arama için <a href="https://hn.algolia.com/api" target="_blank" rel="noopener noreferrer">HN Search API</a> kullanılır.
+  </p>
+  <p class="footer__muted">Bu bir Hacker News istemcisidir; Y Combinator ile resmi bağlantısı yoktur.</p>
+</footer>
+
+<dialog class="help" id="help" aria-labelledby="help-title">
+  <div class="help__head">
+    <h2 id="help-title">Klavye kısayolları</h2>
+    <button class="icon-btn" id="help-close" type="button" aria-label="Kapat">✕</button>
+  </div>
+  <dl class="help__list">
+    <div><dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Sonraki / önceki gönderi</dd></div>
+    <div><dt><kbd>Enter</kbd> / <kbd>o</kbd></dt><dd>Gönderiyi aç</dd></div>
+    <div><dt><kbd>c</kbd></dt><dd>Yorumlara git</dd></div>
+    <div><dt><kbd>n</kbd> / <kbd>p</kbd></dt><dd>Yeni yorumlar arasında gez</dd></div>
+    <div><dt><kbd>t</kbd></dt><dd>Başlığı veya yorumu çevir</dd></div>
+    <div><dt><kbd>s</kbd></dt><dd>Kaydet / kaydı kaldır</dd></div>
+    <div><dt><kbd>Shift</kbd>+<kbd>s</kbd></dt><dd>Paylaş / bağlantıyı kopyala</dd></div>
+    <div><dt><kbd>f</kbd></dt><dd>Yüklü yorumlarda ara</dd></div>
+    <div><dt><kbd>,</kbd></dt><dd>Okuma ayarları</dd></div>
+    <div><dt><kbd>/</kbd></dt><dd>Arama kutusu</dd></div>
+    <div><dt><kbd>d</kbd></dt><dd>Tema değiştir</dd></div>
+    <div><dt><kbd>g</kbd></dt><dd>Sayfa başına dön</dd></div>
+    <div><dt><kbd>Esc</kbd></dt><dd>Kapat / odağı bırak</dd></div>
+  </dl>
+</dialog>
+
+<script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
